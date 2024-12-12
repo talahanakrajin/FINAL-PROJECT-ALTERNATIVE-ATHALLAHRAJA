@@ -19,7 +19,7 @@ BACKGROUND_COLOR = (205, 192, 180) # Background color of the window
 FONT_COLOR = (119, 110, 101)
 
 FONT = pygame.font.SysFont('comicsans', 60, bold=True)  # Font of the numbers
-MOVE_VEL = 20   # Velocity of the movement of the numbers
+MOVE_VEL = 50   # Velocity of the movement of the numbers
 
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))   # Window object
 pygame.display.set_caption('2048')  # Title of the window
@@ -35,6 +35,9 @@ class Tile:
         (237, 208, 115),
         (237, 204, 99),
         (236, 202, 80),
+        (237, 200, 80),
+        (237, 197, 63),
+        (237, 194, 46),
     ]
 
     def __init__(self, value, row, col):    
@@ -89,6 +92,112 @@ def draw(window, tiles): # Draw the window
     draw_grid(window) # Draw the grid
     pygame.display.update() # Update the window
 
+def draw_pause_menu(window):
+    window.fill(BACKGROUND_COLOR)
+    
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
+    button_font = pygame.font.SysFont('comicsans', 60)
+    
+    title_text = title_font.render("Paused", 1, FONT_COLOR)
+    resume_text = button_font.render("RESUME", 1, FONT_COLOR)
+    restart_text = button_font.render("RESTART", 1, FONT_COLOR)
+    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)
+            
+    title_y = HEIGHT // 4
+    button_y = HEIGHT // 2 - 50
+
+    resume_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)
+    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)
+    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 200, 300, 60)
+    
+    mouse_pos = pygame.mouse.get_pos()
+    
+    if resume_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), resume_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, resume_button)
+    
+    if restart_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), restart_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)
+    
+    if main_menu_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), main_menu_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)
+    
+    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))
+    window.blit(resume_text, (resume_button.x + resume_button.width // 2 - resume_text.get_width() // 2, resume_button.y + resume_button.height // 2 - resume_text.get_height() // 2))
+    window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))
+    window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))
+    
+    pygame.display.update()
+
+def draw_game_over(window, background):
+    window.blit(background, (0, 0))  # Use the captured background image
+    
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
+    button_font = pygame.font.SysFont('comicsans', 60)
+    
+    title_text = title_font.render("Game Over", 1, FONT_COLOR)
+    title_outline = title_font.render("Game Over", 1, (0, 0, 0))  # Black outline
+    restart_text = button_font.render("RESTART", 1, FONT_COLOR)
+    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)
+
+    title_y = HEIGHT // 4
+    button_y = HEIGHT // 2 - 50
+
+    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)
+    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)
+    
+    mouse_pos = pygame.mouse.get_pos()
+    
+    if restart_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), restart_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)
+    
+    if main_menu_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), main_menu_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)
+    
+    # Draw the outline first
+    window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 - 2, title_y - 2))
+    window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 + 2, title_y - 2))
+    window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 - 2, title_y + 2))
+    window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 + 2, title_y + 2))
+    
+    # Draw the title text
+    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))
+    window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))
+    window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))
+    
+    pygame.display.update()
+
+def game_over_menu(window, background):
+    run = True
+    while run:
+        draw_game_over(window, background)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                return "quit"
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                
+                restart_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 - 50, 300, 60)
+                main_menu_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 50, 300, 60)
+                
+                if restart_button.collidepoint(mouse_pos):
+                    return "restart"
+                if main_menu_button.collidepoint(mouse_pos):
+                    return "main_menu"
+
 def get_random_pos(tiles): # Get a random position for the tile
     row = None
     col = None
@@ -104,6 +213,7 @@ def get_random_pos(tiles): # Get a random position for the tile
 def move_tiles(window, tiles, clock, direction): # Move the tiles
     updated = True
     blocks = set()
+    moved = False
 
     if direction == 'left': # If the direction is left
         sort_func = lambda x: x.col # Sort the tiles based on the column
@@ -159,34 +269,53 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
 
             if not next_tile:
                 tile.move(delta)
-            elif (tile.value == next_tile.value and next_tile not in blocks and next_tile not in blocks):
+                moved = True
+            elif (tile.value == next_tile.value and tile not in blocks and next_tile not in blocks):
 
                 if merge_check(tile, next_tile):
                     tile.move(delta)
-                    
+                    moved = True
                 else:
                     next_tile.value *= 2
                     sorted_tiles.pop(i)
                     blocks.add(next_tile)
+                    del tiles[f"{tile.row}{tile.col}"]  # Remove the merged tile from the tiles dictionary
+                    moved = True
 
             elif move_check(tile, next_tile):
                 tile.move(delta)
+                moved = True
             else:
                 continue
         
             tile.set_pos(ceil)
             updated = True
         update_tiles(window, tiles, sorted_tiles)
-    return end_move(tiles)
+    
+    if moved:
+        return end_move(tiles)
+    if len(tiles) == ROWS * COL and not can_move_or_merge(tiles):
+        return "lost"
+    return "continue"
+
+def can_move_or_merge(tiles):
+    for tile in tiles.values():
+        # Check if any adjacent tiles can be merged
+        for delta in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            neighbor_row = tile.row + delta[0]
+            neighbor_col = tile.col + delta[1]
+            neighbor_key = f"{neighbor_row}{neighbor_col}"
+            if neighbor_key in tiles and tiles[neighbor_key].value == tile.value:
+                return True
+    return False
 
 def end_move(tiles):
-    if len(tiles) == 16:
+    if len(tiles) == ROWS * COL and not can_move_or_merge(tiles):
         return "lost"
 
     row, col = get_random_pos(tiles)
     tiles[f"{row}{col}"] = Tile(random.choice([2, 4]), row, col)
     return "continue"
-
 
 def update_tiles(window, tiles, sorted_tiles):
     tiles.clear()
@@ -203,33 +332,207 @@ def generate_tiles():
 
     return tiles
 
-def main(window):               
-    clock = pygame.time.Clock() # Clock object to control the FPS
-    run = True  # Main loop flag
+def draw_main_menu(window):
+    window.fill(BACKGROUND_COLOR)
     
-    tiles = generate_tiles() # Create the tiles
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
+    button_font = pygame.font.SysFont('comicsans', 60)
+    
+    title_text = title_font.render("2048", 1, FONT_COLOR)
+    play_text = button_font.render("PLAY", 1, FONT_COLOR)
+    quit_text = button_font.render("QUIT", 1, FONT_COLOR)
 
+    play_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2, 200, 60)
+    quit_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 100, 200, 60)
+
+    mouse_pos = pygame.mouse.get_pos()
+
+    if play_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), play_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, play_button)
+    
+    if quit_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), quit_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, quit_button)
+    
+    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, HEIGHT // 4))
+    window.blit(play_text, (play_button.x + play_button.width // 2 - play_text.get_width() // 2, play_button.y + play_button.height // 2 - play_text.get_height() // 2))
+    window.blit(quit_text, (quit_button.x + quit_button.width // 2 - quit_text.get_width() // 2, quit_button.y + quit_button.height // 2 - quit_text.get_height() // 2))
+
+    pygame.display.update()
+
+def draw_win_screen(window, background):
+    window.blit(background, (0, 0))  # Use the captured background image
+    
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
+    button_font = pygame.font.SysFont('comicsans', 60)
+    
+    title_text = title_font.render("YOU WIN!", 1, FONT_COLOR)
+    restart_text = button_font.render("RESTART", 1, FONT_COLOR)
+    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)
+
+    title_y = HEIGHT // 4
+    button_y = HEIGHT // 2 - 50
+
+    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)
+    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)
+    
+    mouse_pos = pygame.mouse.get_pos()
+    
+    if restart_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), restart_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)
+    
+    if main_menu_button.collidepoint(mouse_pos):
+        pygame.draw.rect(window, (150, 150, 150), main_menu_button)
+    else:
+        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)
+    
+    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))
+    window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))
+    window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))
+    
+    pygame.display.update()
+
+def win_menu(window, background):
+    run = True
     while run:
-        clock.tick(FPS) # Control the FPS
-
+        draw_win_screen(window, background)
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-                break
+                pygame.quit()
+                return "quit"
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                
+                restart_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 - 50, 300, 60)
+                main_menu_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 50, 300, 60)
+                
+                if restart_button.collidepoint(mouse_pos):
+                    return "restart"
+                if main_menu_button.collidepoint(mouse_pos):
+                    return "main_menu"
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    move_tiles(window, tiles, clock, 'left')
-                elif event.key == pygame.K_RIGHT:
-                    move_tiles(window, tiles, clock, 'right')
-                elif event.key == pygame.K_UP:
-                    move_tiles(window, tiles, clock, 'up')
-                elif event.key == pygame.K_DOWN:
-                    move_tiles(window, tiles, clock, 'down')
+def check_win(tiles):
+    for tile in tiles.values():
+        if tile.value == 2048:
+            return True
+    return False
 
-        draw(window, tiles) # Draw the window
+def main_menu(window):
+    run = True
+    while run:
+        draw_main_menu(window)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                return False
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                
+                play_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2, 200, 60)
+                quit_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 100, 200, 60)
+                
+                if play_button.collidepoint(mouse_pos):
+                    return True
+                if quit_button.collidepoint(mouse_pos):
+                    run = False
+                    pygame.quit()
+                    return False
 
-    pygame.quit()
+def pause_menu(window):
+    run = True
+    while run:
+        draw_pause_menu(window)
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+                pygame.quit()
+                return "quit"
+            
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                
+                resume_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 - 50, 300, 60)
+                restart_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 50, 300, 60)
+                main_menu_button = pygame.Rect(WIDTH // 2 - 150, HEIGHT // 2 + 150, 300, 60)
+                
+                if resume_button.collidepoint(mouse_pos):
+                    return "resume"
+                if restart_button.collidepoint(mouse_pos):
+                    return "restart"
+                if main_menu_button.collidepoint(mouse_pos):
+                    return "main_menu"
+
+def main(window):
+    while True:
+        if not main_menu(window):
+            return
+                           
+        clock = pygame.time.Clock() # Clock object to control the FPS
+        run = True  # Main loop flag
+        
+        tiles = generate_tiles() # Create the tiles
+        result = "continue"  # Initialize result variable
+
+        while run:
+            clock.tick(FPS) # Control the FPS
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    run = False
+                    break
+                
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_p:
+                        result = pause_menu(window)
+                        if result == "resume":
+                            continue
+                        elif result == "restart":
+                            tiles = generate_tiles()
+                        elif result == "main_menu":
+                            main_menu(window)
+                            
+                    elif event.key == pygame.K_r:
+                        tiles = generate_tiles()
+                    elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                        result = move_tiles(window, tiles, clock, 'left')
+                    elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                        result = move_tiles(window, tiles, clock, 'right')
+                    elif event.key == pygame.K_w or event.key == pygame.K_UP:
+                        result = move_tiles(window, tiles, clock, 'up')
+                    elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                        result = move_tiles(window, tiles, clock, 'down')
+
+                if result == "lost":
+                    background = window.copy()  # Capture the current screen
+                    result = game_over_menu(window, background)
+                    if result == "restart":
+                        tiles = generate_tiles()
+                    elif result == "main_menu":
+                        main_menu(window)
+                
+                if check_win(tiles):
+                    background = window.copy()  # Capture the current screen
+                    result = win_menu(window, background)
+                    if result == "restart":
+                        tiles = generate_tiles()
+                    elif result == "main_menu":
+                        main_menu(window)
+
+            draw(window, tiles) # Draw the window
+ 
+        pygame.quit()
 
 if __name__ == '__main__':
     main(WINDOW)
