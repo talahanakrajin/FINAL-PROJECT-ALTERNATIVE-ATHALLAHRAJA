@@ -18,8 +18,9 @@ This project is a clone of the popular 2048 game implemented using the Pygame li
 1. Use the arrow keys to move the tiles.
 2. Tiles with the same number merge into one when they touch.
 3. The goal is to create a tile with the number 2048.
-4. Press 'P' to pause the game and access the pause menu.
+4. Press 'esc' to pause the game and access the pause menu.
 5. Press 'R' to restart the game.
+6. Press 'Play' on the main menu to start a new game.
 
 ### How to Run:
 1. Ensure you have the Pygame library installed.

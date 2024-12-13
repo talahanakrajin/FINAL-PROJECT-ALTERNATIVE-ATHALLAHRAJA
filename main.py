@@ -24,6 +24,10 @@ MOVE_VEL = 50   # Velocity of the movement of the numbers
 WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))   # Window object
 pygame.display.set_caption('2048')  # Title of the window
 
+# Load sound effects
+WIN_SOUND = pygame.mixer.Sound('win.mp3')
+LOSE_SOUND = pygame.mixer.Sound('lose.mp3')
+
 class Tile:
     COLORS = [
         (237, 229, 218),
@@ -178,6 +182,7 @@ def draw_game_over(window, background):
 
 def game_over_menu(window, background):
     run = True
+    LOSE_SOUND.play()  # Play lose sound
     while run:
         draw_game_over(window, background)
         
@@ -210,9 +215,24 @@ def get_random_pos(tiles): # Get a random position for the tile
     
     return row, col
 
+def merge_check(tile, next_tile, delta):
+    if delta[0] != 0:  # Horizontal movement
+        return abs(tile.x - next_tile.x) <= MOVE_VEL
+    else:  # Vertical movement
+        return abs(tile.y - next_tile.y) <= MOVE_VEL
+
+def animate_merge(window, tile, next_tile, delta, clock, tiles):
+    merge_delta = (delta[0] * 1.5, delta[1] * 1.5)  # Increase the speed of the merge animation
+    while not merge_check(tile, next_tile, merge_delta):
+        tile.move(merge_delta)
+        tile.set_pos()
+        draw(window, tiles)
+        clock.tick(FPS)
+    draw(window, tiles)  # Ensure final position is drawn
+
 def move_tiles(window, tiles, clock, direction): # Move the tiles
     updated = True
-    blocks = set()
+    blocks = set() # Set of the tiles that have been merged
     moved = False
 
     if direction == 'left': # If the direction is left
@@ -221,7 +241,6 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
         delta = (-MOVE_VEL, 0) # Set the delta of the movement
         boundary_check = lambda tile: tile.col == 0 # Check if the tile is at the boundary
         get_next_tile = lambda tile: tiles.get(f"{tile.row}{tile.col - 1}") # Get the next tile
-        merge_check = lambda tile, next_tile: tile.x > next_tile.x + MOVE_VEL # Check if the tiles can merge
         move_check = lambda tile, next_tile: tile.x > next_tile.x + RECT_WIDTH + MOVE_VEL # Check if the tiles can move
         ceil = True
 
@@ -231,7 +250,6 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
         delta = (MOVE_VEL, 0)
         boundary_check = lambda tile: tile.col == COL - 1
         get_next_tile = lambda tile: tiles.get(f"{tile.row}{tile.col + 1}")
-        merge_check = lambda tile, next_tile: tile.x < next_tile.x - MOVE_VEL
         move_check = lambda tile, next_tile: tile.x < next_tile.x - RECT_WIDTH - MOVE_VEL
         ceil = False
 
@@ -241,7 +259,6 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
         delta = (0, -MOVE_VEL)
         boundary_check = lambda tile: tile.row == 0
         get_next_tile = lambda tile: tiles.get(f"{tile.row - 1}{tile.col}")
-        merge_check = lambda tile, next_tile: tile.y > next_tile.y + MOVE_VEL
         move_check = lambda tile, next_tile: tile.y > next_tile.y + RECT_HEIGHT + MOVE_VEL
         ceil = True
         
@@ -251,8 +268,7 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
         delta = (0, MOVE_VEL)
         boundary_check = lambda tile: tile.row == ROWS - 1
         get_next_tile = lambda tile: tiles.get(f"{tile.row + 1}{tile.col}")
-        merge_check = lambda tile, next_tile: tile.y < next_tile.y - MOVE_VEL
-        move_check = lambda tile, next_tile: tile.y < next_tile.y - RECT_HEIGHT - MOVE_VEL
+        move_check = lambda tile, next_tile: tile.y < next_tile.y - RECT_HEIGHT - MOVE_VEL 
         ceil = False
     
     while updated:
@@ -272,16 +288,18 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
                 moved = True
             elif (tile.value == next_tile.value and tile not in blocks and next_tile not in blocks):
 
-                if merge_check(tile, next_tile):
+                if merge_check(tile, next_tile, delta):
                     tile.move(delta)
                     moved = True
                 else:
+                    # Animate the merging move
+                    animate_merge(window, tile, next_tile, delta, clock, tiles)
                     next_tile.value *= 2
                     sorted_tiles.pop(i)
+                    blocks.add(tile)
                     blocks.add(next_tile)
-                    del tiles[f"{tile.row}{tile.col}"]  # Remove the merged tile from the tiles dictionary
                     moved = True
-
+                    
             elif move_check(tile, next_tile):
                 tile.move(delta)
                 moved = True
@@ -399,6 +417,7 @@ def draw_win_screen(window, background):
 
 def win_menu(window, background):
     run = True
+    WIN_SOUND.play()  # Play win sound
     while run:
         draw_win_screen(window, background)
         
@@ -443,7 +462,7 @@ def main_menu(window):
                 quit_button = pygame.Rect(WIDTH // 2 - 100, HEIGHT // 2 + 100, 200, 60)
                 
                 if play_button.collidepoint(mouse_pos):
-                    return True
+                    return True  # Start a new game
                 if quit_button.collidepoint(mouse_pos):
                     run = False
                     pygame.quit()
@@ -494,14 +513,16 @@ def main(window):
                     break
                 
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_p:
+                    if event.key == pygame.K_ESCAPE:
                         result = pause_menu(window)
                         if result == "resume":
                             continue
                         elif result == "restart":
                             tiles = generate_tiles()
                         elif result == "main_menu":
-                            main_menu(window)
+                            if not main_menu(window):
+                                return
+                            tiles = generate_tiles()
                             
                     elif event.key == pygame.K_r:
                         tiles = generate_tiles()
@@ -520,7 +541,9 @@ def main(window):
                     if result == "restart":
                         tiles = generate_tiles()
                     elif result == "main_menu":
-                        main_menu(window)
+                        if not main_menu(window):
+                            return
+                        tiles = generate_tiles()
                 
                 if check_win(tiles):
                     background = window.copy()  # Capture the current screen
@@ -528,7 +551,9 @@ def main(window):
                     if result == "restart":
                         tiles = generate_tiles()
                     elif result == "main_menu":
-                        main_menu(window)
+                        if not main_menu(window):
+                            return
+                        tiles = generate_tiles()
 
             draw(window, tiles) # Draw the window
  
