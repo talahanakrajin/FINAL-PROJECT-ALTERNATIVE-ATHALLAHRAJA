@@ -2,27 +2,27 @@ import pygame
 import random
 import math
 
-pygame.init()
+pygame.init()  # Initialize Pygame
 
-FPS = 60
+FPS = 60  # Frames per second
 
-WIDTH, HEIGHT = 800, 800
-ROWS = 4
-COL = 4
+WIDTH, HEIGHT = 800, 800  # Width and height of the game window
+ROWS = 4  # Number of rows in the grid
+COL = 4  # Number of columns in the grid
 
-RECT_HEIGHT = HEIGHT // ROWS # Height of each rectangle
-RECT_WIDTH = WIDTH // COL # Width of each rectangle
+RECT_HEIGHT = HEIGHT // ROWS  # Height of each rectangle
+RECT_WIDTH = WIDTH // COL  # Width of each rectangle
 
-OUTLINE_COLOR = (187, 173, 160) # Color of the outline of the rectangles
+OUTLINE_COLOR = (187, 173, 160)  # Color of the outline of the rectangles
 OUTLINE_THICKNESS = 10  # Thickness of the outline of the rectangles
-BACKGROUND_COLOR = (205, 192, 180) # Background color of the window
-FONT_COLOR = (119, 110, 101)
+BACKGROUND_COLOR = (205, 192, 180)  # Background color of the window
+FONT_COLOR = (119, 110, 101)  # Color of the font
 
 FONT = pygame.font.SysFont('comicsans', 60, bold=True)  # Font of the numbers
-MOVE_VEL = 50   # Velocity of the movement of the numbers
+MOVE_VEL = 50  # Velocity of the movement of the numbers
 
-WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))   # Window object
-pygame.display.set_caption('2048')  # Title of the window
+WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))  # Create the game window
+pygame.display.set_caption('2048')  # Set the title of the window
 
 # Load sound effects
 WIN_SOUND = pygame.mixer.Sound('win.mp3')
@@ -67,7 +67,7 @@ class Tile:
         if ceil:   # If ceil is True, round up the position
             self.row = math.ceil(self.y / RECT_HEIGHT)
             self.col = math.ceil(self.x / RECT_WIDTH) 
-        else:
+        else:  # Otherwise, round down the position
             self.row = math.floor(self.y / RECT_HEIGHT)
             self.col = math.floor(self.x / RECT_WIDTH)
         
@@ -97,88 +97,88 @@ def draw(window, tiles): # Draw the window
     pygame.display.update() # Update the window
 
 def draw_pause_menu(window):
-    window.fill(BACKGROUND_COLOR)
-    
-    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
-    button_font = pygame.font.SysFont('comicsans', 60)
-    
-    title_text = title_font.render("Paused", 1, FONT_COLOR)
-    resume_text = button_font.render("RESUME", 1, FONT_COLOR)
-    restart_text = button_font.render("RESTART", 1, FONT_COLOR)
-    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)
-            
-    title_y = HEIGHT // 4
-    button_y = HEIGHT // 2 - 50
+    window.fill(BACKGROUND_COLOR)  # Fill the window with the background color
 
-    resume_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)
-    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)
-    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 200, 300, 60)
-    
-    mouse_pos = pygame.mouse.get_pos()
-    
-    if resume_button.collidepoint(mouse_pos):
-        pygame.draw.rect(window, (150, 150, 150), resume_button)
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)  # Font for the title
+    button_font = pygame.font.SysFont('comicsans', 60)  # Font for the buttons
+
+    title_text = title_font.render("Paused", 1, FONT_COLOR)  # Render the title text
+    resume_text = button_font.render("RESUME", 1, FONT_COLOR)  # Render the resume button text
+    restart_text = button_font.render("RESTART", 1, FONT_COLOR)  # Render the restart button text
+    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)  # Render the main menu button text
+
+    title_y = HEIGHT // 4  # Y position of the title
+    button_y = HEIGHT // 2 - 50  # Y position of the first button
+
+    resume_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)  # Create the resume button
+    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)  # Create the restart button
+    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 200, 300, 60)  # Create the main menu button
+
+    mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
+
+    if resume_button.collidepoint(mouse_pos):  # If the mouse is over the resume button
+        pygame.draw.rect(window, (150, 150, 150), resume_button)  # Highlight the resume button
     else:
-        pygame.draw.rect(window, OUTLINE_COLOR, resume_button)
-    
-    if restart_button.collidepoint(mouse_pos):
-        pygame.draw.rect(window, (150, 150, 150), restart_button)
+        pygame.draw.rect(window, OUTLINE_COLOR, resume_button)  # Draw the resume button
+
+    if restart_button.collidepoint(mouse_pos):  # If the mouse is over the restart button
+        pygame.draw.rect(window, (150, 150, 150), restart_button)  # Highlight the restart button
     else:
-        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)
-    
-    if main_menu_button.collidepoint(mouse_pos):
-        pygame.draw.rect(window, (150, 150, 150), main_menu_button)
+        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)  # Draw the restart button
+
+    if main_menu_button.collidepoint(mouse_pos):  # If the mouse is over the main menu button
+        pygame.draw.rect(window, (150, 150, 150), main_menu_button)  # Highlight the main menu button
     else:
-        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)
-    
-    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))
-    window.blit(resume_text, (resume_button.x + resume_button.width // 2 - resume_text.get_width() // 2, resume_button.y + resume_button.height // 2 - resume_text.get_height() // 2))
-    window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))
-    window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))
-    
-    pygame.display.update()
+        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)  # Draw the main menu button
+
+    window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))  # Draw the title text
+    window.blit(resume_text, (resume_button.x + resume_button.width // 2 - resume_text.get_width() // 2, resume_button.y + resume_button.height // 2 - resume_text.get_height() // 2))  # Draw the resume button text
+    window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))  # Draw the restart button text
+    window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))  # Draw the main menu button text
+
+    pygame.display.update()  # Update the window
 
 def draw_game_over(window, background):
     window.blit(background, (0, 0))  # Use the captured background image
-    
-    title_font = pygame.font.SysFont('comicsans', 100, bold=True)
-    button_font = pygame.font.SysFont('comicsans', 60)
-    
-    title_text = title_font.render("Game Over", 1, FONT_COLOR)
-    title_outline = title_font.render("Game Over", 1, (0, 0, 0))  # Black outline
-    restart_text = button_font.render("RESTART", 1, FONT_COLOR)
-    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)
 
-    title_y = HEIGHT // 4
-    button_y = HEIGHT // 2 - 50
+    title_font = pygame.font.SysFont('comicsans', 100, bold=True)  # Font for the title
+    button_font = pygame.font.SysFont('comicsans', 60)  # Font for the buttons
 
-    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)
-    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)
-    
-    mouse_pos = pygame.mouse.get_pos()
-    
-    if restart_button.collidepoint(mouse_pos):
-        pygame.draw.rect(window, (150, 150, 150), restart_button)
+    title_text = title_font.render("Game Over", 1, FONT_COLOR)  # Render the title text
+    title_outline = title_font.render("Game Over", 1, (0, 0, 0))  # Render the title outline
+    restart_text = button_font.render("RESTART", 1, FONT_COLOR)  # Render the restart button text
+    main_menu_text = button_font.render("MAIN MENU", 1, FONT_COLOR)  # Render the main menu button text
+
+    title_y = HEIGHT // 4  # Y position of the title
+    button_y = HEIGHT // 2 - 50  # Y position of the first button
+
+    restart_button = pygame.Rect(WIDTH // 2 - 150, button_y, 300, 60)  # Create the restart button
+    main_menu_button = pygame.Rect(WIDTH // 2 - 150, button_y + 100, 300, 60)  # Create the main menu button
+
+    mouse_pos = pygame.mouse.get_pos()  # Get the mouse position
+
+    if restart_button.collidepoint(mouse_pos):  # If the mouse is over the restart button
+        pygame.draw.rect(window, (150, 150, 150), restart_button)  # Highlight the restart button
     else:
-        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)
-    
-    if main_menu_button.collidepoint(mouse_pos):
-        pygame.draw.rect(window, (150, 150, 150), main_menu_button)
+        pygame.draw.rect(window, OUTLINE_COLOR, restart_button)  # Draw the restart button
+
+    if main_menu_button.collidepoint(mouse_pos):  # If the mouse is over the main menu button
+        pygame.draw.rect(window, (150, 150, 150), main_menu_button)  # Highlight the main menu button
     else:
-        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)
-    
+        pygame.draw.rect(window, OUTLINE_COLOR, main_menu_button)  # Draw the main menu button
+
     # Draw the outline first
     window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 - 2, title_y - 2))
     window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 + 2, title_y - 2))
     window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 - 2, title_y + 2))
     window.blit(title_outline, (WIDTH // 2 - title_outline.get_width() // 2 + 2, title_y + 2))
-    
+
     # Draw the title text
     window.blit(title_text, (WIDTH // 2 - title_text.get_width() // 2, title_y))
     window.blit(restart_text, (restart_button.x + restart_button.width // 2 - restart_text.get_width() // 2, restart_button.y + restart_button.height // 2 - restart_text.get_height() // 2))
     window.blit(main_menu_text, (main_menu_button.x + main_menu_button.width // 2 - main_menu_text.get_width() // 2, main_menu_button.y + main_menu_button.height // 2 - main_menu_text.get_height() // 2))
-    
-    pygame.display.update()
+
+    pygame.display.update()  # Update the window
 
 def game_over_menu(window, background):
     run = True
