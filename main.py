@@ -28,6 +28,7 @@ pygame.display.set_caption('2048')  # Set the title of the window
 WIN_SOUND = pygame.mixer.Sound('win.mp3')
 LOSE_SOUND = pygame.mixer.Sound('lose.mp3')
 
+# Make the tiles for the game
 class Tile:
     COLORS = [
         (237, 229, 218),
@@ -215,12 +216,14 @@ def get_random_pos(tiles): # Get a random position for the tile
     
     return row, col
 
+#check if a merge is possible
 def merge_check(tile, next_tile, delta):
     if delta[0] != 0:  # Horizontal movement
         return abs(tile.x - next_tile.x) <= MOVE_VEL
     else:  # Vertical movement
         return abs(tile.y - next_tile.y) <= MOVE_VEL
 
+#animate the merging move
 def animate_merge(window, tile, next_tile, delta, clock, tiles):
     merge_delta = (delta[0] * 1.5, delta[1] * 1.5)  # Increase the speed of the merge animation
     while not merge_check(tile, next_tile, merge_delta):
@@ -316,6 +319,7 @@ def move_tiles(window, tiles, clock, direction): # Move the tiles
         return "lost"
     return "continue"
 
+#for checking if any tiles can be merged when the board is full   
 def can_move_or_merge(tiles):
     for tile in tiles.values():
         # Check if any adjacent tiles can be merged
@@ -327,6 +331,7 @@ def can_move_or_merge(tiles):
                 return True
     return False
 
+#return the result of the move
 def end_move(tiles):
     if len(tiles) == ROWS * COL and not can_move_or_merge(tiles):
         return "lost"
@@ -335,6 +340,7 @@ def end_move(tiles):
     tiles[f"{row}{col}"] = Tile(random.choice([2, 4]), row, col)
     return "continue"
 
+#draw the tiles after the move
 def update_tiles(window, tiles, sorted_tiles):
     tiles.clear()
     for tile in sorted_tiles:
@@ -342,6 +348,7 @@ def update_tiles(window, tiles, sorted_tiles):
     
     draw(window, tiles)
 
+#generate the tiles at the start of the game
 def generate_tiles():
     tiles = {}
     for _ in range(2):
@@ -350,6 +357,7 @@ def generate_tiles():
 
     return tiles
 
+#make the main menu for the game
 def draw_main_menu(window):
     window.fill(BACKGROUND_COLOR)
     
@@ -381,6 +389,7 @@ def draw_main_menu(window):
 
     pygame.display.update()
 
+#draw the win screen
 def draw_win_screen(window, background):
     window.blit(background, (0, 0))  # Use the captured background image
     
@@ -415,6 +424,7 @@ def draw_win_screen(window, background):
     
     pygame.display.update()
 
+#draw the game over screen
 def win_menu(window, background):
     run = True
     WIN_SOUND.play()  # Play win sound
@@ -438,12 +448,14 @@ def win_menu(window, background):
                 if main_menu_button.collidepoint(mouse_pos):
                     return "main_menu"
 
+#check if the player has won
 def check_win(tiles):
     for tile in tiles.values():
         if tile.value == 2048:
             return True
     return False
 
+#main menu
 def main_menu(window):
     run = True
     while run:
@@ -468,6 +480,7 @@ def main_menu(window):
                     pygame.quit()
                     return False
 
+#pause menu
 def pause_menu(window):
     run = True
     while run:
@@ -493,6 +506,7 @@ def pause_menu(window):
                 if main_menu_button.collidepoint(mouse_pos):
                     return "main_menu"
 
+#main function
 def main(window):
     while True:
         if not main_menu(window):
